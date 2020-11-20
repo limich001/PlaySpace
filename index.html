@@ -8,10 +8,11 @@
 </head>
 
 <body>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACQvBaoV-D8LX68kUgB-22ZuvTl6X_1dc"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU"></script>
     <div id="container" style="width: 600px; height: 600px;"></div>
 
-    <input type="text" id="keyword"><button id="search">検索実行</button>
+
+    <input type="text" id="keyword"><button id="submit">検索実行</button>
     <button id="clear">結果クリア</button>
     <div id="target"></div>
 
@@ -20,15 +21,23 @@
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 
+
         /***** ユーザーの現在の位置情報を取得 *****/
         function successCallback(position) {
-            var map = new google.maps.Map(container, {
+            const map = new google.maps.Map(container, {
                 zoom: 17,
                 center: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
             });
+
             // クリックした座標の取得
             map.addListener('click', e => {
                 console.log('x座標:' + e.Za.x + ', y座標:' + e.Za.y);
+            });
+
+            //検索ボタンが押されたとき
+            const geocoder = new google.maps.Geocoder();
+            document.getElementById("submit").addEventListener("click", () => {
+                geocodeAddress(geocoder, map);
             });
         }
 
@@ -49,6 +58,23 @@
             document.getElementById("show_result").innerHTML = err_msg;
             //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
         }
+
+        function geocodeAddress(geocoder, resultsMap) {
+            const address = document.getElementById("keyword").value;
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === "OK") {
+                    resultsMap.setCenter(results[0].geometry.location);
+                    new google.maps.Marker({
+                        map: resultsMap,
+                        position: results[0].geometry.location,
+                    });
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
     </script>
+
 </body>
+
 </html>
