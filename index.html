@@ -8,8 +8,8 @@
 </head>
 
 <body>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-    <div id="container" style="width: 500px; height: 500px;"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACQvBaoV-D8LX68kUgB-22ZuvTl6X_1dc"></script>
+    <div id="container" style="width: 600px; height: 600px;"></div>
     <script type="text/javascript">
         var container = document.getElementById("container");
 
@@ -20,6 +20,10 @@
             var map = new google.maps.Map(container, {
                 zoom: 17,
                 center: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+            });
+            // クリックした座標の取得
+            map.addListener('click', e => {
+                console.log('x座標:' + e.Za.x + ', y座標:' + e.Za.y);
             });
         }
 
