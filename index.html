@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
     <div id="container" style="width: 600px; height: 600px;"></div>
 
 
@@ -16,28 +16,45 @@
     <button id="clear">結果クリア</button>
     <div id="target"></div>
 
+    <button id="cafeSearch">カフェ検索</button>
+    <form id="radioForm">
+        <input name="types" type="radio" value="a"> ボーリング
+        <input name="types" type="radio" value="b"> カジノ
+        <input name="types" type="radio" value="c"> 温泉
+    </form>
+
     <script type="text/javascript">
         var container = document.getElementById("container");
+        let map;
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 
 
         /***** ユーザーの現在の位置情報を取得 *****/
         function successCallback(position) {
-            const map = new google.maps.Map(container, {
+            const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            map = new google.maps.Map(container, {
                 zoom: 17,
-                center: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
-            });
-
-            // クリックした座標の取得
-            map.addListener('click', e => {
-                console.log('x座標:' + e.Za.x + ', y座標:' + e.Za.y);
+                center: initPos
             });
 
             //検索ボタンが押されたとき
             const geocoder = new google.maps.Geocoder();
             document.getElementById("submit").addEventListener("click", () => {
                 geocodeAddress(geocoder, map);
+            });
+
+            // formのラジオボタンが押されたとき
+            let form = document.getElementById('radioForm');
+            form.addEventListener('click', () => {
+                console.log(form.types.value);
+                var request = {
+                    location: initPos,
+                    radius: 1000,      // ※１ 表示する半径領域を設定(1 = 1M)
+                    types: ['cafe']    // ※２ typesプロパティの施設タイプを設定
+                };
+                let service = new google.maps.places.PlacesService(map);
+                service.search(request, Result_Places);
             });
         }
 
@@ -59,6 +76,7 @@
             //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
         }
 
+        // キーワード検索
         function geocodeAddress(geocoder, resultsMap) {
             const address = document.getElementById("keyword").value;
             geocoder.geocode({ address: address }, (results, status) => {
@@ -71,6 +89,32 @@
                 } else {
                     alert("Geocode was not successful for the following reason: " + status);
                 }
+            });
+        }
+
+        function Result_Places(results, status){
+            if(status == google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < results.length; i++) {
+                    // 検索結果全てに対しmarkerを設置
+                    var place = results[i];
+                    createMarker({
+                        text: place.name,
+                        position: place.geometry.location
+                    });
+                }
+            }
+        }
+        // 該当する位置にマーカーを表示
+        function createMarker(options) {
+            let marker = new google.maps.Marker({
+                map: map,
+                position: options.position
+            });
+            // 各施設の吹き出しに表示させる処理
+            var infoWnd = new google.maps.InfoWindow();
+            infoWnd.setContent(options.text);
+            google.maps.event.addListener(marker, 'click', function(){
+                infoWnd.open(map, marker);
             });
         }
     </script>
