@@ -47,7 +47,6 @@
             // formのラジオボタンが押されたとき
             let form = document.getElementById('radioForm');
             form.addEventListener('click', () => {
-                console.log(form.types.value);
                 var request = {
                     location: initPos,
                     radius: 1000,      // ※１ 表示する半径領域を設定(1 = 1M)
@@ -97,10 +96,15 @@
                 for (var i = 0; i < results.length; i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
-                    createMarker({
+                    let opt = {
                         text: place.name,
-                        position: place.geometry.location
-                    });
+                        position: place.geometry.location,
+                        rating: place.rating
+                    };
+                    if (place.photos) {
+                        opt.photo = place.photos[0].getUrl();
+                    }
+                    createMarker(opt);
                 }
             }
         }
@@ -112,9 +116,17 @@
             });
             // 各施設の吹き出しに表示させる処理
             var infoWnd = new google.maps.InfoWindow();
-            infoWnd.setContent(options.text);
+            infoWnd.setContent(
+                '<p style="text-align:center;">' + options.text +
+                '<br>Rating: ' + options.rating + '</p>' +
+                '<img src="' + options.photo +
+                '" style="height:200px;">'
+            );
             google.maps.event.addListener(marker, 'click', function(){
                 infoWnd.open(map, marker);
+            });
+            map.addListener('click', function() {
+                if (infoWnd) infoWnd.close();
             });
         }
     </script>
