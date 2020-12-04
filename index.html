@@ -5,23 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpace</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
-    <div id="container" style="width: 600px; height: 600px;"></div>
+    <div id="container"></div>
 
-
-    <input type="text" id="keyword"><button id="submit">検索実行</button>
-    <button id="clear">結果クリア</button>
-    <div id="target"></div>
-
-    <button id="cafeSearch">カフェ検索</button>
-    <form id="radioForm">
-        <input name="types" type="radio" value="a"> ボーリング
-        <input name="types" type="radio" value="b"> カジノ
-        <input name="types" type="radio" value="c"> 温泉
-    </form>
+    <div class="util-wrapper">
+        <input type="text" id="keyword"><button id="submit">検索実行</button>
+        <button id="clear">結果クリア</button>
+        
+        <button id="cafeSearch">カフェ検索</button>
+        <form id="radioForm">
+            <input name="types" type="radio" value="a"> ボーリング
+            <input name="types" type="radio" value="b"> カジノ
+            <input name="types" type="radio" value="c"> 温泉
+        </form>
+    </div>
 
     <script type="text/javascript">
         var container = document.getElementById("container");

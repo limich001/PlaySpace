@@ -1,0 +1,16 @@
+#container {
+    width: 600px;
+    height: 600px;
+}
+@media screen and (max-width: 575px) {
+    * {
+        margin: 0;
+    }
+    #container {
+        width: 100vw;
+        height: 70vh;
+    }
+    .util-wrapper {
+        margin: 1rem;
+    }
+}
