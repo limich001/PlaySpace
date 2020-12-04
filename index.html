@@ -1,102 +1,170 @@
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-<div id="container" style="width: 500px; height: 500px;"></div>
-<form id="target">
-	<input name="types" type="radio" value="a"> ボーリング
-	<input name="types" type="radio" value="b"> カジノ
-	<input name="types" type="radio" value="c"> 温泉
-</form>
-<script type="text/javascript">
-    var container = document.getElementById("container");
-  
-    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+<!DOCTYPE html>
+<html lang="ja">
 
-    /***** ユーザーの現在の位置情報を取得 *****/
-    function successCallback(position) {
-        //現在位置を取得する
-        var map = new google.maps.Map(container, {
-        zoom: 17,
-        center: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
-        });
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaySpace</title>
+</head>
 
-        //現在位置をマークする
-        var marker = new google.maps.Marker({
-            position: {lat:position.coords.latitude, lng:position.coords.longitude},
-            map: map
-        });
+<body>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
+    <div id="container" style="width: 600px; height: 600px;"></div>
 
-        //選択した遊びの種類に基づいてマークを表示する
-        // form要素を取得
-        var element = document.getElementById( "target" ) ;
 
-        // form要素内のラジオボタングループ(name="types")を取得
-        var radioNodeList = element.types ;
+    <input type="text" id="keyword"><button id="submit">検索実行</button>
+    <button id="clear">結果クリア</button>
+    <div id="target"></div>
 
-        // 選択状態の値(value)を取得 (Bが選択状態なら"b"が返る)
-        var type = radioNodeList.value ;
+    <button id="cafeSearch">ジャンル検索</button>
+    <form id="radioForm">
+        <input name="types" type="radio" value="bowling_alley"> ボーリング
+        <input name="types" type="radio" value="casino"> カジノ
+        <input name="types" type="radio" value="spa"> 温泉
+    </form>
 
-        if ( type === "" ) {
-            // 未選択状態
-        } else {
-            // typeには選択状態の値が代入されている
-            if(type === "ボーリング"){
-                startNearbySearch(new google.maps.LatLng(position.coords.latitude, position.coords.longitude), 'bowling_alley');
-            }else if(type === "カジノ"){
-                startNearbySearch(new google.maps.LatLng(position.coords.latitude, position.coords.longitude), 'casino');
-            }else if(type === "温泉"){
-                startNearbySearch(new google.maps.LatLng(position.coords.latitude, position.coords.longitude), 'spa');
-            }
+    <script type="text/javascript">
+        var container = document.getElementById("container");
+        let map;
+        var markers = [];
+
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
+
+        /***** ユーザーの現在の位置情報を取得 *****/
+        function successCallback(position) {
+            const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            map = new google.maps.Map(container, {
+                zoom: 17,
+                center: initPos
+            });
             
+
+            //検索ボタンが押されたとき
+            const geocoder = new google.maps.Geocoder();
+            document.getElementById("submit").addEventListener("click", () => {
+                geocodeAddress(geocoder, map);
+            });
+
+            document.getElementById("clear").addEventListener("click", () => {
+                deleteMakers();
+            });
+
+            // formのラジオボタンが押されたとき
+            let form = document.getElementById('radioForm');
+            var rad = 1000000;
+            document.getElementById("cafeSearch").addEventListener("click", () =>{
+                console.log(form.types.value);
+                deleteMakers();
+                var request;
+                if(form.types.value == "bowling_alley"){
+                    request = {
+                        location: initPos,
+                        radius: rad,      // ※１ 表示する半径領域を設定(1 = 1M)
+                        types: ['bowling_alley'], // ※２ typesプロパティの施設タイプを設定
+                        language: 'ja'
+                    };
+                }else if(form.types.value == "casino"){
+                    request = {
+                        location: initPos,
+                        radius: rad,      // ※１ 表示する半径領域を設定(1 = 1M)
+                        types: ['casino'], // ※２ typesプロパティの施設タイプを設定
+                        language: 'ja'
+                    };
+                }else if(form.types.value == "spa"){
+                    request = {
+                        location: initPos,
+                        radius: rad,      // ※１ 表示する半径領域を設定(1 = 1M)
+                        types: ['spa'], // ※２ typesプロパティの施設タイプを設定
+                        language: 'ja'
+                    };
+                }else{
+                    request = {
+                        location: initPos,
+                        radius: rad,      // ※１ 表示する半径領域を設定(1 = 1M)
+                        types: ['cafe'], // ※２ typesプロパティの施設タイプを設定
+                        language: 'ja'
+                    };
+                }
+                let service = new google.maps.places.PlacesService(map);
+                service.nearbySearch(request, Result_Places);
+            });
         }
 
-    }
-
-    /***** 位置情報が取得できない場合 *****/
-    function errorCallback(error) {
-        var err_msg = "";
-        switch(error.code)
-        {
-            case 1:
-            err_msg = "位置情報の利用が許可されていません";
-            break;
-            case 2:
-            err_msg = "デバイスの位置が判定できません";
-            break;
-            case 3:
-            err_msg = "タイムアウトしました";
-            break;
+        /***** 位置情報が取得できない場合 *****/
+        function errorCallback(error) {
+            var err_msg = "";
+            switch (error.code) {
+                case 1:
+                    err_msg = "位置情報の利用が許可されていません";
+                    break;
+                case 2:
+                    err_msg = "デバイスの位置が判定できません";
+                    break;
+                case 3:
+                    err_msg = "タイムアウトしました";
+                    break;
+            }
+            document.getElementById("show_result").innerHTML = err_msg;
+            //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
         }
-        document.getElementById("show_result").innerHTML = err_msg;
-        //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
-    }
-    
-    /*
-    位置情報を使って周辺検索
-    latLng : 位置座標（google.maps.LatLng）
-    */
-    function startNearbySearch(latLng, keywordOfplayspace){
-    
-        //読み込み中表示
-        document.getElementById("results").innerHTML = "Now Loading...";
-        
-        //Mapインスタンス生成
-        var map = new google.maps.Map(
-            document.createElement("div")
-        );
-        
-        //PlacesServiceインスタンス生成
-        var service = new google.maps.places.PlacesService(map);
-        
-        //周辺検索
-        service.nearbySearch(
-            {
-            location: latLng,
-            radius: 800,
-            type: [keywordOfplayspace],
-            keyword: '',
-            language: 'ja'
-            },
-            displayResults
-        );
-    }
 
-</script>
+        
+
+        // キーワード検索
+        function geocodeAddress(geocoder, resultsMap) {
+            const address = document.getElementById("keyword").value;
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === "OK") {
+                    resultsMap.setCenter(results[0].geometry.location);
+                    new google.maps.Marker({
+                        map: resultsMap,
+                        position: results[0].geometry.location,
+                    });
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+
+        function deleteMakers() {
+            //生成済マーカーを順次すべて削除する
+            for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+            }
+            markers = [];
+        }
+
+        function Result_Places(results, status){
+            if(status == google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < Math.min(results.length,5); i++) {
+                    // 検索結果全てに対しmarkerを設置
+                    var place = results[i];
+                    
+                    createMarker({
+                        text: place.name,
+                        position: place.geometry.location
+                    });
+                   
+                }
+            }
+        }
+        // 該当する位置にマーカーを表示
+        function createMarker(options) {
+            var marker = new google.maps.Marker({
+                map: map,
+                position: options.position
+            });
+            markers.push(marker);
+            // 各施設の吹き出しに表示させる処理
+            var infoWnd = new google.maps.InfoWindow();
+            infoWnd.setContent(options.text);
+            google.maps.event.addListener(marker, 'click', function(){
+                infoWnd.open(map, marker);
+            });
+        }
+    </script>
+
+</body>
+
+</html>
