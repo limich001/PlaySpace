@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpace</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -140,12 +141,13 @@
                 for (var i = 0; i < Math.min(results.length,5); i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
-                    
+                    console.log(place.rating)
                     createMarker({
                         text: place.name,
-                        position: place.geometry.location
+                        position: place.geometry.location,
+                        photo: place.photos[0].getUrl(),
+                        rating: place.rating
                     });
-                   
                 }
             }
         }
@@ -153,15 +155,30 @@
         function createMarker(options) {
             var marker = new google.maps.Marker({
                 map: map,
-                position: options.position
+                position: options.position,
+                photo: options.photo,
+                rating: options.rating
             });
             markers.push(marker);
             // 各施設の吹き出しに表示させる処理
             var infoWnd = new google.maps.InfoWindow();
-            infoWnd.setContent(options.text);
+            let infoWndContent = 
+                "<div class='info-window'>" +
+                    "<p>" + options.text
+            if (options.rating) {
+                infoWndContent += " rate: " + options.rating
+            } 
+            infoWndContent +=
+                    "</p>" +
+                    "<img src='" + options.photo + "'>" +
+                "</div>";
+            infoWnd.setContent(infoWndContent);
             google.maps.event.addListener(marker, 'click', function(){
                 infoWnd.open(map, marker);
             });
+            map.addListener('click', () => {
+                infoWnd.close();
+            })
         }
     </script>
 
