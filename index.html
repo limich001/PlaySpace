@@ -19,16 +19,16 @@
         
         <button id="cafeSearch">ジャンル検索</button>
         <form id="radioForm">
-            <input name="types" type="radio" value="bowling_alley"> ボーリング
-            <input name="types" type="radio" value="casino"> カジノ
-            <input name="types" type="radio" value="spa"> 温泉
-            <input name="types" type="radio" value="cafe"> カフェ
-            <input name="types" type="radio" value="amusement_park"> 遊園地
-            <input name="types" type="radio" value="aquarium"> 水族館
-            <input name="types" type="radio" value="night_club"> ナイトクラブ
-            <input name="types" type="radio" value="movie_theater"> 映画館
-            <input name="types" type="radio" value="park"> 公園
-            <input name="types" type="radio" value="shopping_mall"> ショッピングモール
+            <label><input name="types" type="radio" value="bowling_alley"> ボーリング</label>
+            <label><input name="types" type="radio" value="casino"> カジノ</label>
+            <label><input name="types" type="radio" value="spa"> 温泉</label>
+            <label><input name="types" type="radio" value="cafe"> カフェ</label>
+            <label><input name="types" type="radio" value="amusement_park"> 遊園地</label>
+            <label><input name="types" type="radio" value="aquarium"> 水族館</label>
+            <label><input name="types" type="radio" value="night_club"> ナイトクラブ</label>
+            <label><input name="types" type="radio" value="movie_theater"> 映画館</label>
+            <label><input name="types" type="radio" value="park"> 公園</label>
+            <label><input name="types" type="radio" value="shopping_mall"> ショッピングモール</label>
         </form>
         徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
     </div>
@@ -75,7 +75,7 @@
                         language: 'ja'
                 };
                 let service = new google.maps.places.PlacesService(map);
-                service.nearbySearch(request, Result_Places);
+                service.nearbySearch(request, search_places);
             });
         }
 
@@ -123,12 +123,11 @@
             markers = [];
         }
 
-        function Result_Places(results, status){
+        function search_places(results, status){
             if(status == google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < Math.min(results.length,5); i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
-                    console.log(place.rating)
                     createMarker({
                         text: place.name,
                         position: place.geometry.location,
