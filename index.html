@@ -43,9 +43,10 @@
 
         /***** ユーザーの現在の位置情報を取得 *****/
         function successCallback(position) {
-            const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            // const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
             map = new google.maps.Map(container, {
-                zoom: 17,
+                zoom: 14,
                 center: initPos
             });
             
@@ -128,12 +129,17 @@
                 for (var i = 0; i < Math.min(results.length,5); i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
-                    createMarker({
+                    let options = {
                         text: place.name,
-                        position: place.geometry.location,
-                        photo: place.photos[0].getUrl(),
-                        rating: place.rating
-                    });
+                        position: place.geometry.location
+                    }
+                    if (place.rating) {
+                        options.rating = place.rating;
+                    }
+                    if (place.photos) {
+                        options.photo = place.photos[0].getUrl();
+                    }
+                    createMarker(options);
                 }
             }
         }
@@ -154,10 +160,12 @@
             if (options.rating) {
                 infoWndContent += " rate: " + options.rating
             } 
-            infoWndContent +=
-                    "</p>" +
-                    "<img src='" + options.photo + "'>" +
-                "</div>";
+            infoWndContent += "</p>";
+            if (options.photo) {
+                infoWndContent +=
+                    "<img src='" + options.photo + "'>";
+            }
+            infoWndContent += "</div>";
             infoWnd.setContent(infoWndContent);
             google.maps.event.addListener(marker, 'click', function(){
                 infoWnd.open(map, marker);
