@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlaySpace</title>
+    <link rel="stylesheet" href="style.css">
+ 
+    <!-- iOSのためのPWA化処理 -->
+    <!-- アドレスバー等のブラウザのUIを非表示 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="PlaySpace">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+    <!-- AndroidのためのPWA化処理 -->
+    <link rel="manifest" href="manifest.json">
+    <script defer>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+        .then((reg) => {
+            console.log('Service worker registered.', reg);
+        });
+    }
+    </script>
+</head>
+
+<body>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
+    <div id="container"></div>
+
+    <div class="util-wrapper">
+        <input type="text" id="keyword"><button id="submit">検索実行</button>
+        <button id="clear">結果クリア</button>
+        <div id="target"></div>
+        
+        <button id="cafeSearch">ジャンル検索</button>
+        <form id="radioForm">
+            <label><input name="types" type="radio" value="bowling_alley"> ボーリング</label>
+            <label><input name="types" type="radio" value="casino"> カジノ</label>
+            <label><input name="types" type="radio" value="spa"> 温泉</label>
+            <label><input name="types" type="radio" value="cafe"> カフェ</label>
+            <label><input name="types" type="radio" value="amusement_park"> 遊園地</label>
+            <label><input name="types" type="radio" value="aquarium"> 水族館</label>
+            <label><input name="types" type="radio" value="night_club"> ナイトクラブ</label>
+            <label><input name="types" type="radio" value="movie_theater"> 映画館</label>
+            <label><input name="types" type="radio" value="park"> 公園</label>
+            <label><input name="types" type="radio" value="shopping_mall"> ショッピングモール</label>
+        </form>
+        徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
+    </div>
+
+    <script type="text/javascript">
+        var container = document.getElementById("container");
+        let map;
+        var markers = [];
+
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+
+
+        /***** ユーザーの現在の位置情報を取得 *****/
+        function successCallback(position) {
+            // const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
+            map = new google.maps.Map(container, {
+                zoom: 16,
+                center: initPos
+            });
+            
+
+            //検索ボタンが押されたとき
+            const geocoder = new google.maps.Geocoder();
+            document.getElementById("submit").addEventListener("click", () => {
+                geocodeAddress(geocoder, map);
+            });
+
+            document.getElementById("clear").addEventListener("click", () => {
+                deleteMakers();
+            });
+
+            // formのラジオボタンが押されたとき
+            let form = document.getElementById('radioForm');
+            document.getElementById("cafeSearch").addEventListener("click", () =>{
+                console.log(form.types.value);
+                deleteMakers();
+                var request;
+                var rad = document.getElementById("time").value;
+                rad = 80*rad;
+                request = {
+                        location: initPos,
+                        radius: rad,      // ※１ 表示する半径領域を設定(1 = 1M)
+                        types: [form.types.value], // ※２ typesプロパティの施設タイプを設定
+                        language: 'ja'
+                };
+                let service = new google.maps.places.PlacesService(map);
+                service.nearbySearch(request, search_places);
+            });
+        }
+
+        /***** 位置情報が取得できない場合 *****/
+        function errorCallback(error) {
+            var err_msg = "";
+            switch (error.code) {
+                case 1:
+                    err_msg = "位置情報の利用が許可されていません";
+                    break;
+                case 2:
+                    err_msg = "デバイスの位置が判定できません";
+                    break;
+                case 3:
+                    err_msg = "タイムアウトしました";
+                    break;
+            }
+            document.getElementById("show_result").innerHTML = err_msg;
+            //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
+        }
+
+        
+
+        // キーワード検索
+        function geocodeAddress(geocoder, resultsMap) {
+            const address = document.getElementById("keyword").value;
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === "OK") {
+                    resultsMap.setCenter(results[0].geometry.location);
+                    new google.maps.Marker({
+                        map: resultsMap,
+                        position: results[0].geometry.location,
+                    });
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+
+        function deleteMakers() {
+            //生成済マーカーを順次すべて削除する
+            for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+            }
+            markers = [];
+        }
+
+        function search_places(results, status){
+            if(status == google.maps.places.PlacesServiceStatus.OK) {
+                // 距離の割り出しを行ない、各データにdistance属性を設定
+                results.some(function(data, index){
+                    data.distance = getDistance(data.geometry.location.lat(), data.geometry.location.lng(), map.center.lat(), map.center.lng(), 0) / 1000; //kmで算出
+                });
+
+                // 現在地からの距離が小さい順にソート
+                results.sort(function(a, b){
+                    return (a.distance < b.distance) ? -1 : 1;
+                });
+
+                for (var i = 0; i < Math.min(results.length,5); i++) {
+                    // 検索結果全てに対しmarkerを設置
+                    var place = results[i];
+                    let options = {
+                        text: place.name,
+                        position: place.geometry.location
+                    }
+                    if (place.rating) {
+                        options.rating = place.rating;
+                    }
+                    if (place.photos) {
+                        options.photo = place.photos[0].getUrl();
+                    }
+                    createMarker(options);
+                }
+            }
+        }
+
+        // 該当する位置にマーカーを表示
+        function createMarker(options) {
+            var marker = new google.maps.Marker({
+                map: map,
+                position: options.position,
+                photo: options.photo,
+                rating: options.rating
+            });
+            markers.push(marker);
+            // 各施設の吹き出しに表示させる処理
+            var infoWnd = new google.maps.InfoWindow();
+            let infoWndContent = 
+                "<div class='info-window'>" +
+                    "<p>" + options.text
+            if (options.rating) {
+                infoWndContent += " rate: " + options.rating
+            } 
+            infoWndContent += "</p>";
+            if (options.photo) {
+                infoWndContent +=
+                    "<img src='" + options.photo + "'>";
+            }
+            infoWndContent += "</div>";
+            infoWnd.setContent(infoWndContent);
+            google.maps.event.addListener(marker, 'click', function(){
+                infoWnd.open(map, marker);
+            });
+            map.addListener('click', () => {
+                infoWnd.close();
+            })
+        }
+
+        //距離の割り出し
+        function getDistance(lat1, lng1, lat2, lng2, precision){
+            var distance = 0;
+            if( ( Math.abs(lat1 - lat2) < 0.00001 ) && ( Math.abs(lng1 - lng2) < 0.00001 ) ) {
+                distance = 0;
+            }else{
+                lat1 = lat1 * Math.PI / 180;
+                lng1 = lng1 * Math.PI / 180;
+                lat2 = lat2 * Math.PI / 180;
+                lng2 = lng2 * Math.PI / 180;
+
+                var A = 6378140;
+                var B = 6356755;
+                var F = ( A - B ) / A;
+
+                var P1 = Math.atan( ( B / A ) * Math.tan(lat1) );
+                var P2 = Math.atan( ( B / A ) * Math.tan(lat2) );
+
+                var X = Math.acos( Math.sin(P1) * Math.sin(P2) + Math.cos(P1) * Math.cos(P2) * Math.cos(lng1 - lng2) );
+                var L = ( F / 8 ) * ( ( Math.sin(X) - X ) * Math.pow( (Math.sin(P1) + Math.sin(P2) ), 2) / Math.pow( Math.cos(X / 2), 2 ) - ( Math.sin(X) - X ) * Math.pow( Math.sin(P1) - Math.sin(P2), 2 ) / Math.pow( Math.sin(X), 2) );
+
+                distance = A * ( X + L );
+                var decimal_no = Math.pow(10, precision);
+                distance = Math.round(decimal_no * distance / 1) / decimal_no;
+            }
+            return distance;
+        }
+    </script>
+
+</body>
+
+</html>
