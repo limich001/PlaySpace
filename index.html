@@ -5,31 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpace</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
-    <div id="container" style="width: 600px; height: 600px;"></div>
+    <div id="container"></div>
 
-
-    <input type="text" id="keyword"><button id="submit">検索実行</button>
-    <button id="clear">結果クリア</button>
-    <div id="target"></div>
-
-    <button id="cafeSearch">ジャンル検索</button>
-    <form id="radioForm">
-        <input name="types" type="radio" value="bowling_alley"> ボーリング
-        <input name="types" type="radio" value="casino"> カジノ
-        <input name="types" type="radio" value="spa"> 温泉
-        <input name="types" type="radio" value="cafe"> カフェ
-        <input name="types" type="radio" value="amusement_park"> 遊園地
-        <input name="types" type="radio" value="aquarium"> 水族館
-        <input name="types" type="radio" value="night_club"> ナイトクラブ
-        <input name="types" type="radio" value="movie_theater"> 映画館
-        <input name="types" type="radio" value="park"> 公園
-        <input name="types" type="radio" value="shopping_mall"> ショッピングモール
-    </form>
-    徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
+    <div class="util-wrapper">
+        <input type="text" id="keyword"><button id="submit">検索実行</button>
+        <button id="clear">結果クリア</button>
+        <div id="target"></div>
+        
+        <button id="cafeSearch">ジャンル検索</button>
+        <form id="radioForm">
+            <label><input name="types" type="radio" value="bowling_alley"> ボーリング</label>
+            <label><input name="types" type="radio" value="casino"> カジノ</label>
+            <label><input name="types" type="radio" value="spa"> 温泉</label>
+            <label><input name="types" type="radio" value="cafe"> カフェ</label>
+            <label><input name="types" type="radio" value="amusement_park"> 遊園地</label>
+            <label><input name="types" type="radio" value="aquarium"> 水族館</label>
+            <label><input name="types" type="radio" value="night_club"> ナイトクラブ</label>
+            <label><input name="types" type="radio" value="movie_theater"> 映画館</label>
+            <label><input name="types" type="radio" value="park"> 公園</label>
+            <label><input name="types" type="radio" value="shopping_mall"> ショッピングモール</label>
+        </form>
+        徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
+    </div>
 
     <script type="text/javascript">
         var container = document.getElementById("container");
@@ -41,9 +43,10 @@
 
         /***** ユーザーの現在の位置情報を取得 *****/
         function successCallback(position) {
-            const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            // const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
             map = new google.maps.Map(container, {
-                zoom: 17,
+                zoom: 14,
                 center: initPos
             });
             
@@ -73,7 +76,7 @@
                         language: 'ja'
                 };
                 let service = new google.maps.places.PlacesService(map);
-                service.nearbySearch(request, Result_Places);
+                service.nearbySearch(request, search_places);
             });
         }
 
@@ -121,7 +124,7 @@
             markers = [];
         }
 
-        function Result_Places(results, status){
+        function search_places(results, status){
             if(status == google.maps.places.PlacesServiceStatus.OK) {
                 // 距離の割り出しを行ない、各データにdistance属性を設定
                 results.some(function(data, index){
@@ -136,12 +139,17 @@
                 for (var i = 0; i < Math.min(results.length,5); i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
-                    
-                    createMarker({
+                    let options = {
                         text: place.name,
                         position: place.geometry.location
-                    });
-                   
+                    }
+                    if (place.rating) {
+                        options.rating = place.rating;
+                    }
+                    if (place.photos) {
+                        options.photo = place.photos[0].getUrl();
+                    }
+                    createMarker(options);
                 }
             }
         }
@@ -150,15 +158,32 @@
         function createMarker(options) {
             var marker = new google.maps.Marker({
                 map: map,
-                position: options.position
+                position: options.position,
+                photo: options.photo,
+                rating: options.rating
             });
             markers.push(marker);
             // 各施設の吹き出しに表示させる処理
             var infoWnd = new google.maps.InfoWindow();
-            infoWnd.setContent(options.text);
+            let infoWndContent = 
+                "<div class='info-window'>" +
+                    "<p>" + options.text
+            if (options.rating) {
+                infoWndContent += " rate: " + options.rating
+            } 
+            infoWndContent += "</p>";
+            if (options.photo) {
+                infoWndContent +=
+                    "<img src='" + options.photo + "'>";
+            }
+            infoWndContent += "</div>";
+            infoWnd.setContent(infoWndContent);
             google.maps.event.addListener(marker, 'click', function(){
                 infoWnd.open(map, marker);
             });
+            map.addListener('click', () => {
+                infoWnd.close();
+            })
         }
 
         //距離の割り出し
