@@ -6,23 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpace</title>
     <link rel="stylesheet" href="style.css">
- 
-    <!-- iOSのためのPWA化処理 -->
-    <!-- アドレスバー等のブラウザのUIを非表示 -->
+    <link rel="icon" type="image/png" href="img/icon-192.png">
+    <!-- PWA化処理 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="PlaySpace">
-    <link rel="apple-touch-icon" href="img/icon-192.png">
-    <!-- AndroidのためのPWA化処理 -->
+    <link rel="apple-touch-icon" href="img/icon-192.png" sizes="192x192">
     <link rel="manifest" href="manifest.json">
-    <script defer>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-        .then((reg) => {
-            console.log('Service worker registered.', reg);
-        });
-    }
-    </script>
 </head>
 
 <body>
@@ -232,6 +222,15 @@
         }
     </script>
 
+    <!-- for Android PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then((reg) => {
+                console.log('Service worker registered.', reg);
+            });
+        }
+    </script>
 </body>
 
 </html>
