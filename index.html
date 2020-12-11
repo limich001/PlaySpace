@@ -6,6 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpace</title>
     <link rel="stylesheet" href="style.css">
+ 
+    <!-- iOSのためのPWA化処理 -->
+    <!-- アドレスバー等のブラウザのUIを非表示 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="PlaySpace">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+    <!-- AndroidのためのPWA化処理 -->
+    <link rel="manifest" href="manifest.json">
+    <script defer>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+        .then((reg) => {
+            console.log('Service worker registered.', reg);
+        });
+    }
+    </script>
 </head>
 
 <body>
@@ -46,7 +63,7 @@
             // const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
             map = new google.maps.Map(container, {
-                zoom: 14,
+                zoom: 16,
                 center: initPos
             });
             
