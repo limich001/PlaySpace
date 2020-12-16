@@ -6,23 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PlaySpace</title>
     <link rel="stylesheet" href="style.css">
- 
-    <!-- iOSのためのPWA化処理 -->
-    <!-- アドレスバー等のブラウザのUIを非表示 -->
+    <link rel="icon" type="image/png" href="img/icon-192.png">
+    <!-- PWA化処理 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="PlaySpace">
-    <link rel="apple-touch-icon" href="img/icon-192.png">
-    <!-- AndroidのためのPWA化処理 -->
+    <link rel="apple-touch-icon" href="img/icon-192.png" sizes="192x192">
     <link rel="manifest" href="manifest.json">
-    <script defer>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-        .then((reg) => {
-            console.log('Service worker registered.', reg);
-        });
-    }
-    </script>
 </head>
 
 <body>
@@ -30,29 +20,44 @@
     <div id="container"></div>
 
     <div class="util-wrapper">
-        <input type="text" id="keyword"><button id="submit">検索実行</button>
-        <button id="clear">結果クリア</button>
-        <div id="target"></div>
+        <div class="freeword-wrapper">
+            <input type="text" id="keyword" placeholder="フリーワード検索">
+            <button id="submit">検索実行</button>
+            <button id="clear">結果クリア</button>
+        </div>
         
-        <button id="cafeSearch">ジャンル検索</button>
         <form id="radioForm">
-            <label><input name="types" type="radio" value="bowling_alley"> ボーリング</label>
-            <label><input name="types" type="radio" value="casino"> カジノ</label>
-            <label><input name="types" type="radio" value="spa"> 温泉</label>
-            <label><input name="types" type="radio" value="cafe"> カフェ</label>
-            <label><input name="types" type="radio" value="amusement_park"> 遊園地</label>
-            <label><input name="types" type="radio" value="aquarium"> 水族館</label>
-            <label><input name="types" type="radio" value="night_club"> ナイトクラブ</label>
-            <label><input name="types" type="radio" value="movie_theater"> 映画館</label>
-            <label><input name="types" type="radio" value="park"> 公園</label>
-            <label><input name="types" type="radio" value="shopping_mall"> ショッピングモール</label>
+            <button id="cafeSearch" type="button">ジャンル検索</button>
+            <input id="bo" name="types" type="radio" value="bowling_alley">
+                <label for="bo">ボーリング</label>
+            <input id="ca" name="types" type="radio" value="casino">
+                <label for="ca">カジノ</label>
+            <input id="spa" name="types" type="radio" value="spa">
+                <label for="spa">温泉</label>
+            <input id="cafe" name="types" type="radio" value="cafe">
+                <label for="cafe">カフェ</label>
+            <input id="amu" name="types" type="radio" value="amusement_park">
+                <label for="amu">遊園地</label>
+            <input id="aqu" name="types" type="radio" value="aquarium">
+                <label for="aqu">水族館</label>
+            <input id="ni" name="types" type="radio" value="night_club">
+                <label for="ni">ナイトクラブ</label>
+            <input id="mo" name="types" type="radio" value="movie_theater">
+                <label for="mo">映画館</label>
+            <input id="pa" name="types" type="radio" value="park">
+                <label for="pa">公園</label>
+            <input id="sh" name="types" type="radio" value="shopping_mall">
+                <label for="sh">ショッピングモール</label>
         </form>
-        徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
         <form id="rankingForm">
             <label><input name="types" type="radio" value="distance"> 距離でソート</label>
             <label><input name="types" type="radio" value="rating"> 評価でソート</label>
             <label><input name="types" type="radio" value="all"> 距離、評価でソート</label>
         </form>
+        <div class="specify-wrapper">
+            徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
+            <span>（範囲は1~120分）</span>
+        </div>
     </div>
 
     <script type="text/javascript">
@@ -66,8 +71,8 @@
 
         /***** ユーザーの現在の位置情報を取得 *****/
         function successCallback(position) {
-            // const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
+            const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            // const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
             map = new google.maps.Map(container, {
                 zoom: 16,
                 center: initPos
@@ -291,6 +296,15 @@
         }
     </script>
 
+    <!-- for Android PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then((reg) => {
+                console.log('Service worker registered.', reg);
+            });
+        }
+    </script>
 </body>
 
 </html>
