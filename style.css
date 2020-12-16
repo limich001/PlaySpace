@@ -3,22 +3,76 @@
     height: 600px;
 }
 
+.util-wrapper > * {
+    margin: .5rem 0;
+}
+
+#radioForm input {
+    display: none;
+}
+#radioForm label {
+    padding: 0 .6rem;
+    border-radius: .3rem;
+    transition: all .2s;
+    background: rgba(0,0,0,.1);
+}
+#radioForm input:checked + label{
+    background: #5bc0de;
+    color: #fff;
+    text-shadow: 0 0 1px rgba(0,0,0,.7);
+}
+
+#time {
+    width: 2rem;
+    margin: 0 .2rem;
+}
+
 .info-window {
     text-align: center;
+    width: 100%;
 }
 .info-window img {
     height: 200px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 5px;
 }
 
 @media screen and (max-width: 575px) {
     * {
         margin: 0;
     }
+
     #container {
         width: 100vw;
         height: 70vh;
     }
+
     .util-wrapper {
-        margin: .5rem;
+        margin: .8rem .5rem;
+    }
+
+    .freeword-wrapper {
+        display: flex;
+    }
+    .freeword-wrapper input {
+        flex-grow: 1;
+    }
+
+    #radioForm {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #radioForm button {
+        height: 1.5rem;
+        position: relative;
+        top: .3rem;
+    }
+    #radioForm label {
+        margin: .2rem;
+    }
+
+    .specify-wrapper span {
+        white-space: nowrap;
     }
 }

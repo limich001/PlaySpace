@@ -20,24 +20,39 @@
     <div id="container"></div>
 
     <div class="util-wrapper">
-        <input type="text" id="keyword"><button id="submit">検索実行</button>
-        <button id="clear">結果クリア</button>
-        <div id="target"></div>
+        <div class="freeword-wrapper">
+            <input type="text" id="keyword" placeholder="フリーワード検索">
+            <button id="submit">検索実行</button>
+            <button id="clear">結果クリア</button>
+        </div>
         
-        <button id="cafeSearch">ジャンル検索</button>
         <form id="radioForm">
-            <label><input name="types" type="radio" value="bowling_alley"> ボーリング</label>
-            <label><input name="types" type="radio" value="casino"> カジノ</label>
-            <label><input name="types" type="radio" value="spa"> 温泉</label>
-            <label><input name="types" type="radio" value="cafe"> カフェ</label>
-            <label><input name="types" type="radio" value="amusement_park"> 遊園地</label>
-            <label><input name="types" type="radio" value="aquarium"> 水族館</label>
-            <label><input name="types" type="radio" value="night_club"> ナイトクラブ</label>
-            <label><input name="types" type="radio" value="movie_theater"> 映画館</label>
-            <label><input name="types" type="radio" value="park"> 公園</label>
-            <label><input name="types" type="radio" value="shopping_mall"> ショッピングモール</label>
+            <button id="cafeSearch" type="button">ジャンル検索</button>
+            <input id="bo" name="types" type="radio" value="bowling_alley">
+                <label for="bo">ボーリング</label>
+            <input id="ca" name="types" type="radio" value="casino">
+                <label for="ca">カジノ</label>
+            <input id="spa" name="types" type="radio" value="spa">
+                <label for="spa">温泉</label>
+            <input id="cafe" name="types" type="radio" value="cafe">
+                <label for="cafe">カフェ</label>
+            <input id="amu" name="types" type="radio" value="amusement_park">
+                <label for="amu">遊園地</label>
+            <input id="aqu" name="types" type="radio" value="aquarium">
+                <label for="aqu">水族館</label>
+            <input id="ni" name="types" type="radio" value="night_club">
+                <label for="ni">ナイトクラブ</label>
+            <input id="mo" name="types" type="radio" value="movie_theater">
+                <label for="mo">映画館</label>
+            <input id="pa" name="types" type="radio" value="park">
+                <label for="pa">公園</label>
+            <input id="sh" name="types" type="radio" value="shopping_mall">
+                <label for="sh">ショッピングモール</label>
         </form>
-        徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
+        <div class="specify-wrapper">
+            徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
+            <span>（範囲は1~120分）</span>
+        </div>
     </div>
 
     <script type="text/javascript">
