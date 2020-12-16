@@ -48,12 +48,18 @@
             <label><input name="types" type="radio" value="shopping_mall"> ショッピングモール</label>
         </form>
         徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所（ただし、範囲は１〜１２０分）
+        <form id="rankingForm">
+            <label><input name="types" type="radio" value="distance"> 距離でソート</label>
+            <label><input name="types" type="radio" value="rating"> 評価でソート</label>
+            <label><input name="types" type="radio" value="all"> 距離、評価でソート</label>
+        </form>
     </div>
 
     <script type="text/javascript">
         var container = document.getElementById("container");
         let map;
         var markers = [];
+        
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 
@@ -143,19 +149,35 @@
 
         function search_places(results, status){
             if(status == google.maps.places.PlacesServiceStatus.OK) {
+
                 // 距離の割り出しを行ない、各データにdistance属性を設定
                 results.some(function(data, index){
                     data.distance = getDistance(data.geometry.location.lat(), data.geometry.location.lng(), map.center.lat(), map.center.lng(), 0) / 1000; //kmで算出
                 });
 
-                // 現在地からの距離が小さい順にソート
-                results.sort(function(a, b){
-                    return (a.distance < b.distance) ? -1 : 1;
-                });
+                let rankingForm = document.getElementById('rankingForm');
+                if(rankingForm.types.value == "distance"){
+                    // 現在地からの距離が小さい順にソート
+                    results.sort(function(a, b){
+                        return (a.distance < b.distance) ? -1 : 1;
+                    });
+                }else if(rankingForm.types.value == "rating"){
+                    // 評価が大きい順にソート
+                    results.sort(function(a, b){
+                        return (a.rating > b.rating) ? -1 : 1;
+                    });
+                }else{
+                    // 総合評価が大きい順にソート
+                    results.sort(function(a, b){
+                        return (a.rating/a.distance < b.rating/b.distance) ? -1 : 1;
+                    });
+                }
+                
 
                 for (var i = 0; i < Math.min(results.length,5); i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
+                    console.log(place.rating);
                     let options = {
                         text: place.name,
                         position: place.geometry.location
@@ -229,6 +251,43 @@
                 distance = Math.round(decimal_no * distance / 1) / decimal_no;
             }
             return distance;
+        }
+
+        //ランキング表作成
+        function generate_table() {
+            
+            var tbl = document.createElement("table");
+            // get the reference for the body
+            var body = document.getElementsByTagName("body")[0];
+
+            // creates a <table> element and a <tbody> element
+            var tblBody = document.createElement("tbody");
+
+            // creating all cells
+            for (var i = 0; i < 2; i++) {
+                // creates a table row
+                var row = document.createElement("tr");
+
+                for (var j = 0; j < 2; j++) {
+                    // Create a <td> element and a text node, make the text
+                    // node the contents of the <td>, and put the <td> at
+                    // the end of the table row
+                    var cell = document.createElement("td");
+                    var cellText = document.createTextNode("セルは "+i+" 行 "+j+" 列 です");
+                    cell.appendChild(cellText);
+                    row.appendChild(cell);
+                }
+
+                // add the row to the end of the table body
+                tblBody.appendChild(row);
+            }
+
+            // put the <tbody> in the <table>
+            tbl.appendChild(tblBody);
+            // appends <table> into <body>
+            body.appendChild(tbl);
+            // sets the border attribute of tbl to 2;
+            tbl.setAttribute("border", "2");
         }
     </script>
 
