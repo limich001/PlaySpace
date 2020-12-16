@@ -171,7 +171,7 @@
                     if (place.photos) {
                         options.photo = place.photos[0].getUrl();
                     }
-                    createMarker(options);
+                    createMarkerWithTimeout(options, i*100);
                 }
             }
         }
@@ -182,7 +182,8 @@
                 map: map,
                 position: options.position,
                 photo: options.photo,
-                rating: options.rating
+                rating: options.rating,
+                animation: google.maps.Animation.DROP
             });
             markers.push(marker);
             // 各施設の吹き出しに表示させる処理
@@ -206,6 +207,9 @@
             map.addListener('click', () => {
                 infoWnd.close();
             })
+        }
+        function createMarkerWithTimeout(options, timeout) {
+            setTimeout(createMarker, timeout, options);
         }
 
         //距離の割り出し
