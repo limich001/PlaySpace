@@ -37,11 +37,6 @@
             <button id="clear">結果クリア</button>
         </div>
 
-        <input type="text" id="keyword"><button id="submit">検索実行</button>
-        <button id="clear">結果クリア</button>
-        <div id="target"></div>
-
-        <button id="cafeSearch">ジャンル検索</button>
         <form id="radioForm">
             <button id="cafeSearch" type="button">ジャンル検索</button>
             <input id="bo" name="types" type="radio" value="bowling_alley">
@@ -81,6 +76,7 @@
         let map;
         var markers = [];
         var placesList = [];
+        var PresentPos;
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 
@@ -89,6 +85,8 @@
         function successCallback(position) {
             const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             // const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
+
+            PresentPos = initPos;
             map = new google.maps.Map(container, {
                 zoom: 16,
                 center: initPos
@@ -155,7 +153,7 @@
             var rad = Number(document.getElementById("time").value);
             rad = 80 * rad;
             request = {
-                location: new google.maps.LatLng(35.66956955958302, 139.76704334047545),
+                location: PresentPos,
                 radius: rad,      // ※１ 表示する半径領域を設定(1 = 1M)
                 keyword: address,
                 //types: genre,
