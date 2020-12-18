@@ -69,6 +69,9 @@
             徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
             <span>（範囲は1~120分）</span>
         </div>
+        <h1>グラフ</h1>
+        <canvas id="Chart"></canvas>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
     </div>
 
     <script type="text/javascript">
@@ -77,6 +80,7 @@
         var markers = [];
         var placesList = [];
         var PresentPos;
+        var myChart;
 
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
 
@@ -230,24 +234,26 @@
                 if (rankingForm.types.value == "distance") {
                     // 現在地からの距離が小さい順にソート
                     results.sort(function (a, b) {
-                        return (a.distance < b.distance) ? -1 : 1;
+                        return (a.distance - b.distance);
                     });
                 } else if (rankingForm.types.value == "rating") {
                     // 評価が大きい順にソート
                     results.sort(function (a, b) {
-                        return (a.rating > b.rating) ? -1 : 1;
+                        return (b.rating - a.rating);
                     });
                 } else {
                     // 総合評価が大きい順にソート
                     results.sort(function (a, b) {
-                        return (a.rating / a.distance < b.rating / b.distance) ? -1 : 1;
+                        return ((b.rating+10) / (b.distance*10) - (a.rating+10) / (a.distance*10));
                     });
                 }
+
+                makeChart(results,rankingForm.types.value);
 
                 for (var i = 0; i < Math.min(results.length, 5); i++) {
                     // 検索結果全てに対しmarkerを設置
                     var place = results[i];
-                    console.log(place.rating);
+                    console.log(place.distance);
                     let options = {
                         text: place.name,
                         position: place.geometry.location
@@ -327,42 +333,45 @@
             return distance;
         }
 
-        //ランキング表作成
-        function generate_table() {
-
-            var tbl = document.createElement("table");
-            // get the reference for the body
-            var body = document.getElementsByTagName("body")[0];
-
-            // creates a <table> element and a <tbody> element
-            var tblBody = document.createElement("tbody");
-
-            // creating all cells
-            for (var i = 0; i < 2; i++) {
-                // creates a table row
-                var row = document.createElement("tr");
-
-                for (var j = 0; j < 2; j++) {
-                    // Create a <td> element and a text node, make the text
-                    // node the contents of the <td>, and put the <td> at
-                    // the end of the table row
-                    var cell = document.createElement("td");
-                    var cellText = document.createTextNode("セルは " + i + " 行 " + j + " 列 です");
-                    cell.appendChild(cellText);
-                    row.appendChild(cell);
-                }
-
-                // add the row to the end of the table body
-                tblBody.appendChild(row);
+        //帯グラフを作成
+        function makeChart(results, type){
+            if (myChart) {
+                myChart.destroy();
             }
-
-            // put the <tbody> in the <table>
-            tbl.appendChild(tblBody);
-            // appends <table> into <body>
-            body.appendChild(tbl);
-            // sets the border attribute of tbl to 2;
-            tbl.setAttribute("border", "2");
+            var score = [];
+            if(type == "distance"){
+                for (var i = 0; i < 5; i++) {
+                    score.push(1/results[i].distance);
+                }
+            }else if(type == "rating"){
+                for (var i = 0; i < 5; i++) {
+                    score.push(results[i].rating);
+                }
+            }else{
+                for (var i = 0; i < 5; i++) {
+                    score.push((results[i].rating+10) / (results[i].distance*10));
+                }
+            }
+            myChart = new Chart(document.getElementById("Chart"), {
+                type: "horizontalBar",
+                data: {
+                    labels: ["おすすめ度"],
+                    datasets: [
+                    { label: results[0].name, data: [score[0]], backgroundColor: "rgba(255, 0, 0, 0.6)" },
+                    { label: results[1].name, data: [score[1]], backgroundColor: "rgba(255, 160, 16, 0.6)" },
+                    { label: results[2].name, data: [score[2]], backgroundColor: "rgba(255, 224, 32, 0.6)" },
+                    { label: results[3].name, data: [score[3]], backgroundColor: "rgba(96, 255, 128, 0.6)" },
+                    { label: results[4].name, data: [score[4]], backgroundColor: "rgba(80, 208, 255, 0.6)" }
+                    ]
+                },
+                options: {
+                    plugins: {
+                        stacked100: { enable: true }
+                    }
+                }
+            });
         }
+        
     </script>
 
     <!-- for Android PWA -->
