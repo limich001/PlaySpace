@@ -61,9 +61,12 @@
             <label for="sh">ショッピングモール</label>
         </form>
         <form id="rankingForm">
-            <label><input name="types" type="radio" value="distance"> 距離でソート</label>
-            <label><input name="types" type="radio" value="rating"> 評価でソート</label>
-            <label><input name="types" type="radio" value="all"> 距離、評価でソート</label>
+            <input id="_di" name="types" type="radio" value="distance">
+            <label for="_di">距離ソート</label>
+            <input id="_ra" name="types" type="radio" value="rating">
+            <label for="_ra">評価ソート</label>
+            <input id="_all" name="types" type="radio" value="all" checked>
+            <label for="_all">距離、評価ソート</label>
         </form>
         <div class="specify-wrapper">
             徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
@@ -386,6 +389,20 @@
                     console.log('Service worker registered.', reg);
                 });
         }
+    </script>
+    <!-- for genre search button -->
+    <script>
+        const btn = document.querySelector('#radioForm button');
+        for (label of document.querySelectorAll('form label')) {
+            label.addEventListener('click', () => {
+                btn.style.background = '#d9376e';
+                btn.style.color = 'white';
+            });
+        }
+        btn.addEventListener('click', () => {
+            btn.style.background = 'initial';
+            btn.style.color = '#2a2a2a';
+        });
     </script>
 </body>
 
