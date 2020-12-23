@@ -1,3 +1,7 @@
+* {
+    font-family: "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro", "Yu Gothic Medium", "游ゴシック Medium", YuGothic, "游ゴシック体", "メイリオ", sans-serif;
+}
+
 #container {
     width: 600px;
     height: 600px;
@@ -28,9 +32,6 @@ form input:checked + label {
     color: #fff;
     text-shadow: 0 0 1px rgba(0,0,0,.7);
 }
-form input:checked + button {
-    color: red;
-}
 #radioForm input:checked + label {
     background: #5bc0de;
 }
@@ -39,8 +40,7 @@ form input:checked + button {
 }
 
 #time {
-    width: 2rem;
-    margin: 0 .2rem;
+    width: 3rem;
 }
 
 .info-window {
@@ -75,9 +75,14 @@ form input:checked + button {
         flex-grow: 1;
     }
 
-    form {
+    #radioForm {
         display: flex;
         flex-wrap: wrap;
+    }
+    #rankingForm {
+        display: flex;
+        flex-wrap: nowrap;
+        font-size: .85rem;
     }
     #radioForm button {
         height: 1.5rem;

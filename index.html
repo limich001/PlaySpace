@@ -19,7 +19,7 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then((reg) => {
-                    console.log('Service worker registered.', reg);
+                    // console.log('Service worker registered.', reg);
                 });
         }
     </script>
@@ -68,8 +68,16 @@
             <label for="_all">距離、評価ソート</label>
         </form>
         <div class="specify-wrapper">
-            徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
-            <span>（範囲は1~120分）</span>
+            徒歩
+            <select id="time" onchange="btnWannaBePushed()">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+            </select>
+            分で行ける場所
         </div>
         <h2>おすすめ度ランキング</h2>
         <canvas id="Chart"></canvas>
@@ -385,23 +393,25 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then((reg) => {
-                    console.log('Service worker registered.', reg);
+                    // console.log('Service worker registered.', reg);
                 });
         }
     </script>
     <!-- for genre search button -->
     <script>
         const btn = document.querySelector('#radioForm button');
-        for (label of document.querySelectorAll('form label')) {
-            label.addEventListener('click', () => {
-                btn.style.background = '#d9376e';
-                btn.style.color = 'white';
-            });
+        function btnWannaBePushed() {
+            btn.style.background = '#d9376e';
+            btn.style.color = 'white';
         }
-        btn.addEventListener('click', () => {
+        function btnPushed() {
             btn.style.background = 'initial';
             btn.style.color = '#2a2a2a';
-        });
+        }
+        for (label of document.querySelectorAll('form label')) {
+            label.addEventListener('click', btnWannaBePushed);
+        }
+        btn.addEventListener('click', btnPushed);
     </script>
 </body>
 
