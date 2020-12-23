@@ -11,7 +11,7 @@
     <!-- iOSのためのPWA化処理 -->
     <!-- アドレスバー等のブラウザのUIを非表示 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
     <meta name="apple-mobile-web-app-title" content="PlaySpace">
     <link rel="apple-touch-icon" href="img/icon-192.png" sizes="192x192">
     <link rel="manifest" href="manifest.json">
@@ -26,8 +26,7 @@
 </head>
 
 <body>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
     <div id="container"></div>
 
     <div class="util-wrapper">
@@ -72,7 +71,7 @@
             徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
             <span>（範囲は1~120分）</span>
         </div>
-        <h1>おすすめ度ランキング</h1>
+        <h2>おすすめ度ランキング</h2>
         <canvas id="Chart"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
     </div>
