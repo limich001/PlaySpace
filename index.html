@@ -11,7 +11,7 @@
     <!-- iOSのためのPWA化処理 -->
     <!-- アドレスバー等のブラウザのUIを非表示 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
     <meta name="apple-mobile-web-app-title" content="PlaySpace">
     <link rel="apple-touch-icon" href="img/icon-192.png" sizes="192x192">
     <link rel="manifest" href="manifest.json">
@@ -19,15 +19,14 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then((reg) => {
-                    console.log('Service worker registered.', reg);
+                    // console.log('Service worker registered.', reg);
                 });
         }
     </script>
 </head>
 
 <body>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXZxoQOGvcMxWvA6iuQdOAxJeiJIzi6lU&libraries=places"></script>
     <div id="container"></div>
 
     <div class="util-wrapper">
@@ -61,15 +60,26 @@
             <label for="sh">ショッピングモール</label>
         </form>
         <form id="rankingForm">
-            <label><input name="types" type="radio" value="distance"> 距離でソート</label>
-            <label><input name="types" type="radio" value="rating"> 評価でソート</label>
-            <label><input name="types" type="radio" value="all"> 距離、評価でソート</label>
+            <input id="_di" name="types" type="radio" value="distance">
+            <label for="_di">距離ソート</label>
+            <input id="_ra" name="types" type="radio" value="rating">
+            <label for="_ra">評価ソート</label>
+            <input id="_all" name="types" type="radio" value="all" checked>
+            <label for="_all">距離、評価ソート</label>
         </form>
         <div class="specify-wrapper">
-            徒歩<input type="number" value="10" min="1" max="100000" step="1" id="time">分で行ける場所
-            <span>（範囲は1~120分）</span>
+            徒歩
+            <select id="time" onchange="btnWannaBePushed()">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+            </select>
+            分で行ける場所
         </div>
-        <h1>おすすめ度ランキング</h1>
+        <h2>おすすめ度ランキング</h2>
         <canvas id="Chart"></canvas>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
     </div>
@@ -383,9 +393,25 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then((reg) => {
-                    console.log('Service worker registered.', reg);
+                    // console.log('Service worker registered.', reg);
                 });
         }
+    </script>
+    <!-- for genre search button -->
+    <script>
+        const btn = document.querySelector('#radioForm button');
+        function btnWannaBePushed() {
+            btn.style.background = '#d9376e';
+            btn.style.color = 'white';
+        }
+        function btnPushed() {
+            btn.style.background = 'initial';
+            btn.style.color = '#2a2a2a';
+        }
+        for (label of document.querySelectorAll('form label')) {
+            label.addEventListener('click', btnWannaBePushed);
+        }
+        btn.addEventListener('click', btnPushed);
     </script>
 </body>
 
