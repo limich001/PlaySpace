@@ -97,8 +97,8 @@
 
         /***** ユーザーの現在の位置情報を取得 *****/
         function successCallback(position) {
-            const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            // const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
+            // const initPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            const initPos = new google.maps.LatLng(35.66956955958302, 139.76704334047545);
 
             PresentPos = initPos;
             map = new google.maps.Map(container, {

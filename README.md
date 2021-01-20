@@ -22,7 +22,7 @@ Google Mapとは違って、
 4. 総合ランキング
     選択したソート方法に基づいて、おすすめ度を視覚化する。
 
-<img src="img/view.jpeg" width=50%>
+<img src="img/view.png" width=40%>
 
 ## 総合ランキングの評価方法
 計算式は
@@ -38,4 +38,4 @@ PWAとして機能します。
 
 iPhoneの場合はSafariで開く必要があります。
 
-<img src="img/screen.jpeg" width=50%>
+<img src="img/screen.jpeg" width=40%>
