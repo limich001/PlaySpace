@@ -1,7 +1,8 @@
 # PlaySpace
 
-デモ版：https://limich001.github.io/PlaySpace/
 ![icon](img/icon-192.png)
+
+デモ版：https://limich001.github.io/PlaySpace/
 
 Google map よりも手軽に簡単に遊ぶ場所の検索をしたい
 学生向けの
@@ -20,12 +21,14 @@ Google Mapとは違って、
     5分単位で5〜30分の時間指定が可能。
 4. 総合ランキング
     選択したソート方法に基づいて、おすすめ度を視覚化する。
-![view](img/view.jpeg)
+
+<img src="img/view.jpeg" width=50%>
 
 ## 総合ランキングの評価方法
 計算式は
 (評価+10)/(距離*10)
 です。
+
 ![ranking](img/ranking.jpeg)
 
 ## PWA ダウンロード
@@ -34,4 +37,5 @@ Google Mapとは違って、
 PWAとして機能します。
 
 iPhoneの場合はSafariで開く必要があります。
-![screen](img/screen.jpeg)
+
+<img src="img/screen.jpeg" width=50%>
